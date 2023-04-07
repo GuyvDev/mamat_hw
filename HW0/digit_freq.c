@@ -41,9 +41,10 @@ void print_array (int array[], int len)
 {
     int i;
 
-    for (i = 0; i < len; i++) {
+    for (i = 0; i < len - 1; i++) { 
         printf("%d ", array[i]);
     }
 
-    printf("\n");
+    //  The last num print witout spacing
+    printf("%d\n", array[i]);
 }
