@@ -1,8 +1,12 @@
-א. להערכתנו היה לוקח שעתיים לבצע זאת ידני.
-ב. מהתרגיל נסיק שאוטומציה היא כלי חזק שנעדיף להשתמש בו כמה שיותר.
-ג. נוכל להוסיף את הקובץ למנהל המשימות האוטמטי של לינוקס - cron כך:
-	נריץ בטרמינל crontab -e
-	נבחר editor (נניח nano)
-	נוסיף שורה לפי התבנית הבאה (ושינוי לכתובת הנכונה של הסקריפט): 
-0 * * * * /path-to-script
+A. We estimate it would have taken two hours to do this manually.
+B. We can conclude that automation is a powerful tool that saves time and effort.
+C. We can add the file to the Linux automatic task manager - cron like this:
+	We will run in terminal: 
+	$ crontab -e
+	
+	select editor (let's say nano).
+	
+	We will add a line according to the following pattern 
+	(with the correct path of the script):
 
+	0 * * * * /path-to-script
