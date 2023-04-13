@@ -1,21 +1,26 @@
 #!/bin/bash
-urls=$(wget -O- https://www.ynetnews.com/category/3082 | \
-	grep -Eo "https://www.ynetnews.com/article/[a-zA-Z0-9./?=_%:-]*" | \
-	sort -u)
-echo "$urls" | wc -l > results.csv;
-echo "$urls" | while read line
+shopt -s expand_aliases; alias wg="wget --no-check-certificate -q -O-";
+urls=$(wg https://www.ynetnews.com/category/3082 | \
+	grep -oP "https://(www.)?ynetnews.com/article/[a-zA-Z0-9]+" | \
+	sort -u) 
+print+="$(echo "$urls" | wc -l)"
+echo "$urls" | ( while read line
 do
-    netanyahu_count=$(wget -O- $line | grep -o "Netanyahu" | wc -l)
-    gantz_count=$(wget -O- $line | grep -o "Gantz" | wc -l)
-    bennett_count=$(wget -O- $line | grep -o "Bennett" | wc -l)
-    peretz_count=$(wget -O- $line | grep -o "Peretz" | wc -l)
+    # In order to count all names with "uniq -c", we added each one of them once 
+    # at the end, we decreased them respectively otherwise, we won't be able to
+    # distinguish the counting order in the array
+    arr=($(wg "$line"| cat - <(echo "Netanyahu Gantz Bennett Peretz")|\
+            grep -oE 'Gantz|Netanyahu|Bennett|Peretz' | \
+            sort -d | uniq -c | awk '{print $1}'))
 
-    if [ $netanyahu_count -eq 0 ] && [ $gantz_count -eq 0 ] && \
-       [ $bennett_count -eq 0 ] && [ $peretz_count -eq 0 ]
-    then
-        echo "$line, -" >> results.csv
+    # In case the array contains only 1, it is just our adding, 
+    # therefore the page didn't contain these names orginally
+    if [[ "${arr[*]}" == $'1 1 1 1' ]]; then 
+        print+="\n$line, -"
     else
-        echo "$line, Netanyahu, $netanyahu_count, Gantz, $gantz_count," \
-	"Bennett, $bennett_count, Peretz, $peretz_count" >> results.csv
+        print+="\n$line, Netanyahu, $((${arr[2]}-1)), Gantz, $((${arr[1]}-1)),"\
+	    print+=" Bennett, $((${arr[0]}-1)), Peretz, $((${arr[3]}-1))"
     fi
+    unset arr;
 done
+echo -e "$print" > results.csv;) 
