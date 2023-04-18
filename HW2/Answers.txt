@@ -1,0 +1,13 @@
+1.We reused a lot of code between the different programs. We could have combined all the programs into one program. By that, we would have saved unnecessary reuse of code.
+
+2.  When we ran the command 10,000 times and inserted the data into "hist.exe" we got distribution that corresponded to continuous uniform distribution:
+0-9     1002
+10-19   1055
+20-29   992
+30-39   967
+40-49   1003
+50-59   1031
+60-69   1000
+70-79   994
+80-89   1005
+90-100  954
