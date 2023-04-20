@@ -1,10 +1,10 @@
 #!/bin/bash
 file=./"$1".txt
 if [ "$#" -ne 1 ]; then
-    echo "Worng number of arguments"
+    echo "Worng number of arguments" >&2
     exit
 elif [ ! -f "$file" ]; then
-    echo "Course not found"
+    echo "Course not found" >&2
     exit
 else
     rm -r ./"$1"_stat 2> /dev/null
