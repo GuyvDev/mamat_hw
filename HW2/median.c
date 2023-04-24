@@ -43,7 +43,7 @@ void median_operate(FILE *f) {
 
 	/* inputs[] represents the grade histogram.
 		We sum all the instances of every grade to the middle instance */
-	while ((sum < ((num_grades+1)/2)) && (i < 100)) {
+	while ((sum < ((num_grades+1)/2)) && (i <= 100)) {
 		sum += inputs[i];
 		i++;
 	}
