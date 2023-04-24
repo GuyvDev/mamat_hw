@@ -1,6 +1,24 @@
-1.We reused a lot of code between the different programs. We could have combined all the programs into one program. By that, we would have saved unnecessary reuse of code.
+1. We reused a lot of code between the different programs.
+We could have combined all the programs into one program.
+By that, we would have saved unnecessary reuse of code.
 
-2.  When we ran the command 10,000 times and inserted the data into "hist.exe" we got distribution that corresponded to continuous uniform distribution:
+2. Grades 0-100 are discrete variables. A discrete variable is a finite number
+or a countable set of numbers. In our case, there are 101 possible values, 
+from 0 to 100 inclusive. Discrete uniform distribution, by definition, 
+is a distribution in which all the values in a finite group have equal 
+probability, which in our case 1/100. The command "od -An -N2 -i /dev/random"
+returns a random number between 0 and 65535 (equivalent to 0xFFFF),
+then we take mod 100. Therefore we will get the last two digits from 
+the set 0-65535. Hence 100 is not received. The remainders 0-35 (inclusive)
+have a slightly higher chance than the other numbers 
+(they repeat 656 times in the set 0-65535 compared to 655 times for the others).
+
+Therefore the distribution is not uniform.
+
+However, we should mention that the distribution is very close to a uniform
+distribution. It could be correct by adding a finite number of values to the set
+of numbers. When we ran the command 10,000 times and inserted the data into 
+"hist.exe" we got:
 0-9     1002
 10-19   1055
 20-29   992
