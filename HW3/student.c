@@ -1,8 +1,7 @@
 #include "student.h"
+#include <string.h>
 
-unsigned int my_strlen(const char *s);
-char* my_strcpy(char* destination, const char* source);
-Result check_input(student_t* t_student);
+static Result check_input(student_t* t_student);
 
 elem_t student_clone(elem_t e) {
 	if (e == NULL) {
@@ -21,12 +20,12 @@ elem_t student_clone(elem_t e) {
 		return NULL;
 	}
 
-	c_student->name = (char*) malloc(my_strlen(tmp->name) + 1);
+	c_student->name = (char*) malloc(strlen(tmp->name) + 1);
 	if (c_student->name == NULL) {
 		fprintf(stderr, "Can't allocate memory\n");
 		return NULL;
 	}
-	my_strcpy(c_student->name, tmp->name);
+	strcpy(c_student->name, tmp->name);
 	c_student->age = tmp->age;
 	c_student->id = tmp->id;
 	return c_student;
@@ -55,50 +54,11 @@ void student_print(elem_t e) {
 }
 
 /**
- * @brief Calculates the length of a string.
- * 
- * This function calculates the length of a null-terminated string.
- * 
- * @param s The string to calculate the length of.
- * @return The length of the string.
- */
-unsigned int my_strlen(const char *s) {
-	unsigned int count = 0;
-	while (*s != '\0') {
-		count++;
-		s++;
-	}
-	return count;
-}
-
-/**
- * @brief Copies a string.
- * @param destination The destination buffer to copy the string to.
- * @param source The source string to be copied.
- * @return A pointer to the destination buffer.
- */
-char* my_strcpy(char* destination, const char* source) {
-	if (destination == NULL) {
-		return NULL;
-	}
- 
-	char *ptr = destination;
- 
-	while (*source != '\0') {
-		*destination = *source;
-		destination++;
-		source++;
-	} 
-	*destination = '\0';
- 	return ptr;
-}
-
-/**
  * @brief Check if the inputs are valid.
  * @param t_student The student object with inputs to check.
  * @return SUCCESS if the inputs are valid, FAIL otherwise.
  */
-Result check_input(student_t* t_student) {
+static Result check_input(student_t* t_student) {
 	if (t_student->age < 0) {
 		fprintf(stderr, "The age is not a valid number\n");
 		return FAIL;
