@@ -14,13 +14,13 @@ elem_t student_clone(elem_t e) {
 		return NULL;
 	}
 
-	c_student = (student_t*) malloc(sizeof(*e));
+	c_student = (student_t*)malloc(sizeof(*e));
 	if (c_student == NULL) {
 		fprintf(stderr, "Can't allocate memory\n");
 		return NULL;
 	}
 
-	c_student->name = (char*) malloc(strlen(tmp->name) + 1);
+	c_student->name = (char*)malloc(strlen(tmp->name) + 1);
 	if (c_student->name == NULL) {
 		fprintf(stderr, "Can't allocate memory\n");
 		return NULL;

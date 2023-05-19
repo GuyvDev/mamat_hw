@@ -17,7 +17,7 @@ struct stack {
 pstack_t stack_create(size_t max_num_of_elem, clone_t clone, destroy_t destroy,
 					  print_t print) {
 	struct stack *pstack_t;
-	pstack_t = (struct stack*) malloc(sizeof(*pstack_t));
+	pstack_t = (struct stack*)malloc(sizeof(*pstack_t));
 	if (pstack_t == NULL) {
 		fprintf(stderr, "Can't allocate memory\n");
 		return NULL;
@@ -64,7 +64,7 @@ Result stack_push(pstack_t stack, elem_t e) {
 	struct elem_t *elem_tmp;
 	void *clone;
 
-	elem_tmp = (struct elem_t*) malloc(sizeof(*e));
+	elem_tmp = (struct elem_t*)malloc(sizeof(*e));
 	if (elem_tmp == NULL) {
 		fprintf(stderr, "Can't allocate memory\n");
 		return FAIL;
