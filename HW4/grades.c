@@ -4,6 +4,10 @@
 #include "grades.h"
 #include <string.h>
 
+/*The grade struct is a list of students (l_student), the list consists of
+n_students elements, every student has its own list of courses (l_course),
+and the list consists of n_course elements */
+
 typedef struct grades {
 	struct list *l_students;
 }*pgrades_t, grades_t;
@@ -39,15 +43,22 @@ int student_clone(void *element, void **output) {
 		return 1;
 	}
 
-	struct iterator* it;
-	for (it = list_begin(c_student->l_course); it != NULL; it = list_next(it)) {
-		course_t *tmp = (course_t*)list_get(it);
-		if (tmp == NULL) {
+	/*Copy all the courses from c_student to new_student*/
+	struct list *l_course = c_student->l_course;
+	struct iterator *it = list_begin(l_course);
+	if (it == NULL && list_size(l_course) != 0) {
+		return 1;
+	}
+	while (it != NULL) {
+		course_t *it_course = (course_t*)list_get(it);
+		if (it_course == NULL) {
+			continue; /*If one course is corrupted, move to the next.*/
+		}
+		if (list_push_back(new_student->l_course, it_course) != 0) {
 			return 1;
 		}
-		if (list_push_back(new_student->l_course, tmp) != 0) {
-			return 1;
-		}
+		
+		it = list_next(it);
 	}
 
 	*output = new_student;
@@ -136,6 +147,8 @@ int grades_add_student(struct grades *grades, const char *name, int id) {
 	}
 
 	int flag = list_push_back(grades->l_students, new_student);
+	/*list_push_back pushes copy of new_student,
+	therefore we need to destroy new_studnet*/
 	student_destroy(new_student);
 	return flag;
 }
@@ -160,6 +173,8 @@ int grades_add_grade(struct grades *grades,
 	}
 
 	int flag = list_push_back(c_student->l_course, new_course);
+	/*list_push_back pushes copy of new_course,
+	therefore we need to destroy new_course*/
 	course_destroy(new_course);
 	return flag;
 }
@@ -179,17 +194,25 @@ float grades_calc_avg(struct grades *grades, int id, char **out) {
 	
 	size_t l_size = list_size(c_student->l_course);
 	if (l_size == 0) {
+		/*If the list of courses is empty, the avg is 0*/
 		return 0;
 	}
 
-	struct iterator* it;
+	/*Iterate every course and sum up the grades*/
+	struct list *l_course = c_student->l_course;
+	struct iterator *it = list_begin(l_course);
+	if (it == NULL && list_size(l_course) != 0) {
+		return -1;
+	}
 	int sum_grades = 0;
-	for (it = list_begin(c_student->l_course); it != NULL; it = list_next(it)) {
-		course_t *tmp = (course_t*)list_get(it);
-		if (tmp == NULL) {
-			return -1;
+	while (it != NULL) {
+		course_t *it_course = (course_t*)list_get(it);
+		if (it_course == NULL) {
+			continue; /*If one course is corrupted, move to the next.*/
 		}
-		sum_grades += tmp->course_grade;
+		sum_grades += it_course->course_grade;
+
+		it = list_next(it);
 	}
 	return ((float)sum_grades / l_size);
 }
@@ -202,24 +225,32 @@ int grades_print_student(struct grades *grades, int id) {
 	
 	fprintf(stdout, "%s %d:", c_student->student_name, c_student->id);
 
-	struct iterator* it = list_begin(c_student->l_course);
-	if (it == NULL) {
+	struct list *l_course = c_student->l_course;
+	struct iterator *it = list_begin(l_course);
+	if (list_size(l_course) == 0) {
+		/*If there are no courses for c_student*/
 		fprintf(stdout, "\n");
 		return 0;
 	}
+	else if (it == NULL) {
+		return 1; /*If there are courses, but there is an error*/
+	}
 
-	for (;it != NULL; it = list_next(it)) {
-		course_t *tmp = (course_t*)list_get(it);
-		if (tmp == NULL) {
-			return 1;
+	while (it != NULL) {
+		course_t *it_course = (course_t*)list_get(it);
+		if (it_course == NULL) {
+			continue; /*If one course is corrupted, move to the next*/
 		}
-		fprintf(stdout, " %s %d", tmp->course_name, tmp->course_grade);
+		fprintf(stdout, " %s %d", it_course->course_name,
+								  it_course->course_grade);
 		if (list_next(it) != NULL) {
 			fprintf(stdout, ",");
 		}
 		else {
 			fprintf(stdout, "\n");
 		}
+
+		it = list_next(it);
 	}
 	return 0;
 }
@@ -229,19 +260,27 @@ int grades_print_all(struct grades *grades) {
 		return 1;
 	}
 	
-	struct iterator* it;
-	for (it = list_begin(grades->l_students); it != NULL; it = list_next(it)) {
-		student_t *tmp = (student_t*)list_get(it);
-		if (tmp == NULL) {
+	struct list *l_student = grades->l_students;
+	struct iterator *it = list_begin(l_student);
+	if (it == NULL && list_size(l_student) != 0) {
+		return 1;
+	}
+
+	while (it != NULL) {
+		student_t *it_student = (student_t*)list_get(it);
+		if (it_student == NULL) {
+			continue; /*If one student is corrupted, move to the next.*/
+		}
+		if (grades_print_student(grades, it_student->id) != 0) {
 			return 1;
 		}
-		if (grades_print_student(grades, tmp->id) != 0) {
-			return 1;
-		}
+
+		it = list_next(it);
 	}
 	return 0;
 }
 
+/*Parser inputs and allocate corresponding memory*/
 student_t* init_student_node(const char *name, int id) {
 	if (id < 0 || name == NULL) {
 		return NULL;
@@ -264,24 +303,34 @@ student_t* init_student_node(const char *name, int id) {
 	return t_student;
 }
 
+/*Search for a given id in the grades structure,
+and return a pointer to the student structure*/
 student_t* search_student(struct grades* grades, int id) {
 	if (grades == NULL || id < 0) {
 		return NULL;
 	}
 
-	struct iterator* it;
-	for (it = list_begin(grades->l_students); it != NULL; it = list_next(it)) {
-		student_t *tmp = list_get(it);
-		if (tmp == NULL) {
-			return NULL;
-		}
-		if (tmp->id == id) {
-			return tmp;
-		}
+	struct list *l_student = grades->l_students;
+	struct iterator *it = list_begin(l_student);
+	if (it == NULL && list_size(l_student) != 0) {
+		return NULL;
 	}
+	while (it != NULL) {
+		student_t *it_student = list_get(it);
+		if (it_student == NULL) {
+			continue; /*If one student is corrupted, move to the next*/
+		}
+		if (it_student->id == id) {
+			return it_student;
+		}
+
+		it = list_next(it);
+	}
+	/*If the student not founded*/
 	return NULL;
 }
 
+/*Parser inputs and allocate corresponding memory*/
 course_t* init_course_node(const char *name, int grade) {
 	if (name == NULL || grade < 0 || grade > 100) {
 		return NULL;
