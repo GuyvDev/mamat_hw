@@ -2,6 +2,7 @@
 
 const char* COMMA = ",";
 const char* EQUAL = "=";
+const char* EMPTY_STR_I = "";
 const int SIZE_OF_FIELD_ITEM = 2;
 const int FIELD_INDEX = 0;
 const int DATA_INDEX_P = 1;
@@ -53,7 +54,7 @@ int ip_from_String(const String& ip_string) {
 	int result = 0;
 	String *decimal_bytes;
 	size_t number_of_bytes;
-	ip_string.trim().split(DOT,&decimal_bytes, &number_of_bytes);
+	ip_string.trim().split(DOT, &decimal_bytes, &number_of_bytes);
 	if (number_of_bytes != NUMBER_OF_EXPECTED_BYTES_FROM_DATA) {
 		delete[] decimal_bytes;
 		return ERROR;
@@ -97,7 +98,10 @@ bool Ip::set_value(String val) {
 	return true;
 }
 
-bool Ip::match(String value) { //write better
+bool Ip::match(String value) {
+	if (value.equals(EMPTY_STR_I)) {
+		return false;
+	}
 	bool result_match = false;
 	size_t fields_and_values_length;
 	String **fields_and_values = packet_field_extractor(value,

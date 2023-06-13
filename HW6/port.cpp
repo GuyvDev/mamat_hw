@@ -7,6 +7,7 @@ const int MAX_PLACE = 1;
 const char* HYPHEN = "-";
 const char* COMMA_PORT = ",";
 const char* EQUAL_PORT = "=";
+const char* EMPTY_STR_P = "";
 const int SIZE_OF_FIELD_ITEM = 2;
 const int FIELD_INDEX = 0;
 const int DATA_INDEX = 1;
@@ -59,6 +60,9 @@ bool Port::set_value(String val) {
 }
 
 bool Port::match(String value) {
+	if (value.equals(EMPTY_STR_P)) {
+		return false;
+	}
 	bool result_match = false;
 	size_t fields_and_values_length;
 	String **fields_and_values = packet_field_extractor_port(value,
