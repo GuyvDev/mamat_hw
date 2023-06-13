@@ -56,6 +56,9 @@ bool String::equals(const char* rhs) const {
 void String::split(const char *delimiters,
 	String **output, size_t *size) const {
 
+   if (size == nullptr) {
+	return;
+   }
    if (delimiters == nullptr) {
 		*size = 0;
 		return;
